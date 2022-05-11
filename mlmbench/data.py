@@ -176,15 +176,15 @@ class Datasets(object):
         smi = []
 
         for key in keys:
-            #try:
-            xdata_row = dataset["xdata"].data[key]
-            target_row = dataset["target"].data[key]
-            smi_row = dataset["smi"][key]
-            xdata.append(xdata_row)
-            target.append(target_row)
-            smi.append(smi_row)
-            #except:
-        #        continue
+            try:
+                xdata_row = dataset["xdata"].data[key]
+                target_row = dataset["target"].data[key]
+                smi_row = dataset["smi"][key]
+                xdata.append(xdata_row)
+                target.append(target_row)
+                smi.append(smi_row)
+            except:
+                continue
 
         return {"xdata": np.array(xdata).astype(float),
                 "target": np.array(target).astype(float),
@@ -203,7 +203,7 @@ class Datasets(object):
 
 if __name__ in "__main__":
     ds = Datasets()
-    for train_data, test_data, val_data in ds.ttv_generator("esol"):
+    for train_data, test_data, val_data in ds.ttv_generator("esol-random"):
         print("train ", train_data["xdata"].shape, train_data["target"].shape, len(train_data["smi"]))
         print("test ", test_data["xdata"].shape, test_data["target"].shape, len(test_data["smi"]))
         print("val ", val_data["xdata"].shape, val_data["target"].shape, len(val_data["smi"]))
