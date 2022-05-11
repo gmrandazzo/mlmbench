@@ -1,6 +1,30 @@
 #!/usr/bin/env python3
+# data.py mlmbench
+#
+# Copyright (C) <2022>  Giuseppe Marco Randazzo
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+import numpy as np
 import string
 from pathlib import Path
+
+class CSVTable(object):
+    def __init__(self):
+        self.data = {}
+        self.header = []
+        return
 
 
 def read_data_csv(csvtab):
@@ -8,17 +32,17 @@ def read_data_csv(csvtab):
     Read a CSV table and save it into a dictionary where keys are the
     compound names. The header is instead saved into a list.
     """
-    tab = {}
-    header = None
+    tab = CSVTable()
+
     f = open(csvtab, "r")
     for line in f:
         v = str.split(line.strip(), ",")
         if "Molecule" in line:
-            header = v[1:]
+            tab.header = v[1:]
         else:
-            tab[v[0]] = v[1:]
+            tab.data[v[0]] = v[1:]
     f.close()
-    return tab, header
+    return tab
 
 
 def read_splits(fsplits):
@@ -65,26 +89,6 @@ def read_smi(fsmi):
     f.close()
     return smi
 
-
-def make_set(dataset, keys):
-    """
-    Giving a set of keys, from a dataset this method create
-    a set of X, target, smiles data.
-    """
-    xdata = []
-    target = []
-    smi = []
-    for key in keys:
-        try:
-            xdata_row = dataset["xdata"][key]
-            target_row = dataset["target"][key]
-            smi_row = dataset["smi"][key]
-            xdata.append(xdata_row)
-            target.append(target_row)
-            smi.append(smi_row)
-        except:
-            continue
-    return xdata, target, smi
 
 
 class Datasets(object):
@@ -149,7 +153,7 @@ class Datasets(object):
                 self.dsets[name]["target"] = read_data_csv(self.dsets[name]["ftarget"])
 
             if self.dsets[name]["smi"] is None:
-                self.dsets[name]["fsmi"] = read_smi(self.dsets[name]["fsmi"])
+                self.dsets[name]["smi"] = read_smi(self.dsets[name]["fsmi"])
 
             if self.dsets[name]["splits"] is None:
                 self.dsets[name]["splits"] = read_splits(self.dsets[name]["fsplits"])
@@ -162,6 +166,45 @@ class Datasets(object):
             return None
 
 
+    def make_set(self, dataset, keys):
+        """
+        Giving a set of keys, from a dataset this method create
+        a set of X, target, smiles data.
+        """
+        xdata = []
+        target = []
+        smi = []
+
+        for key in keys:
+            #try:
+            xdata_row = dataset["xdata"].data[key]
+            target_row = dataset["target"].data[key]
+            smi_row = dataset["smi"][key]
+            xdata.append(xdata_row)
+            target.append(target_row)
+            smi.append(smi_row)
+            #except:
+        #        continue
+
+        return {"xdata": np.array(xdata).astype(float),
+                "target": np.array(target).astype(float),
+                "smi": smi}
+
+
+    def ttv_generator(self, name):
+        dataset = self.get_dataset(name)
+
+        for split in dataset["splits"]:
+            train_data = self.make_set(dataset, split["train_keys"])
+            test_data = self.make_set(dataset, split["test_keys"])
+            val_data = self.make_set(dataset, split["val_keys"])
+
+            yield train_data, test_data, val_data
+
 if __name__ in "__main__":
     ds = Datasets()
-    ds.get_dataset("esol")
+    for train_data, test_data, val_data in ds.ttv_generator("esol"):
+        print("train ", train_data["xdata"].shape, train_data["target"].shape, len(train_data["smi"]))
+        print("test ", test_data["xdata"].shape, test_data["target"].shape, len(test_data["smi"]))
+        print("val ", val_data["xdata"].shape, val_data["target"].shape, len(val_data["smi"]))
+        print("-"*40)
