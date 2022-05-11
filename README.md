@@ -27,4 +27,24 @@ Every subfloder needs the following files with the following names:
 How to use
 ----------
 
+```
+#!/usr/bin/env python3
+
+from mlmbench.data import Datasets
+
+ds = Datasets()
+print(ds.get_available_datasets())
+
+for train_data, test_data, val_data in ds.ttv_generator("esol-random"):
+    print("train ", train_data["xdata"].shape, train_data["target"].shape, len(train_data["smi"]))
+    print("test ", test_data["xdata"].shape, test_data["target"].shape, len(test_data["smi"]))
+    print("val ", val_data["xdata"].shape, val_data["target"].shape, len(val_data["smi"]))
+    
+    # Do ml training/test validation, collect the results and store it in your 
+    # appropriate format to do your analysis.
+
+    print("-"*40)
+
+
+```
 
