@@ -22,6 +22,7 @@ def read_data_csv(csvtab):
         else:
             tab.data[v[0]] = v[1:]
     f.close()
+    print(len(tab.header))
     return tab
 
 
