@@ -47,10 +47,11 @@ def main():
        subset to be divided into training/test using a random selection approach
     4) Continue until the number of splits ends for any target.
     """
+
     for tgtid in range(len(tgt.header)):
         lst = []
         for key in tgt.data.keys():
-            lst.append([key, float(tgt.data[key][tgtid])])
+            lst.append([key, tgt.data[key][tgtid]])
 
         lst = sorted(lst,key=lambda x: x[1])
 

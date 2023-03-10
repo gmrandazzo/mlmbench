@@ -1,28 +1,38 @@
 # MLMBench - MachineLearning Molecular Benchmarch
-MLMBench collects datasets and splits to do FAIR ML benchmarks.
+MLMBench collects datasets and splits them to do FAIR ML benchmarks.
 MLMBench can be used with different ML algorithms and data representations
-for molecular property/activity predictions.
+for molecular property/activity predictions and more.
 
-The scope of this code is to keep a simple API representation
-without the need for external libraries and keep the
-dataset representation in a widely supported format such as CSV (RFC 4180 standard).
+The scope of this code is:
+- keep a simple API representation
+- no need of other libraries
+- keep the dataset offline and represented as CSV file (RFC 4180 standard) or SMILES string list.
 
 
-Splits are made using well known rational approaches such as:
+Splits are made using well-known rational approaches such as:
 
 - random split
 - meaningful split for model target extrapolation
 - meaningful split for chemical diversity extrapolation
+- literature published split
 
-The datasets are stored into the "data" directory in subfolders.
-Every subfloder needs the following files with the following names:
+The datasets are stored in the "data" directory in subfolders.
+Every subfolder needs the following files with the following names:
 
-- Readme.txt: explain some dataset info (provenience, type of data, descriptors version and so on)
-- cv.splits: the split required to do a fair trainin,test,validation in any ml algorithm
+- Readme.txt: explain some dataset info (provenience, type of data, descriptors version, and so on)
+- cv.splits: the split required to do a fair trainin, test, validation in any ml algorithm
 - dataset.csv: the matrix of features 
 - target.csv: the matrix of target/targets
 - dataset.smi: the smiles list
 
+Install
+-------
+
+```
+
+pip3 install mlmbench
+
+```
 
 How to use
 ----------
@@ -34,7 +44,7 @@ from mlmbench.data import Datasets
 
 ds = Datasets()
 print(ds.get_available_datasets())
-
+print(f'Dataset info: {ds.get_info("esol-random")}')
 for train_data, test_data, val_data in ds.ttv_generator("esol-random"):
     print("train ", train_data["xdata"].shape, train_data["target"].shape, len(train_data["smi"]))
     print("test ", test_data["xdata"].shape, test_data["target"].shape, len(test_data["smi"]))
@@ -45,6 +55,27 @@ for train_data, test_data, val_data in ds.ttv_generator("esol-random"):
 
     print("-"*40)
 
-
 ```
+
+Submit new dataset
+__________________
+
+1) Fork the project!
+2) Clone the forked project
+3) Add the dataset in this form:
+    dataset.csv: tabular data for any kind of descriptors
+    target.csv: tabular data for one or multiple targets
+    dataset.smi: smiles of the molecule in its appropriate format "c1ccccc1 benzene"
+    cv.split: The split you like. This specific file needs to be compatible with the following
+    	      standard. The file comprises lines representing the model,
+    	      groups split by the ";" character, and every group representing
+    	      the compound name, and every name is split using the "," character.
+    i.e.
+           train keys           test keys            validation keys
+    line 1  mol1,mol2,mol3,.. ; mol200,mol201,... ; mol400,mol401,...
+    line 2  ...
+    line 3  ..
+
+    Readme.md: Info regarding the dataset(i.e. source and so on)
+4) Create a pull request and 99.9% will be merged
 
