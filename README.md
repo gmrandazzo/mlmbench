@@ -1,4 +1,8 @@
 # MLMBench - MachineLearning Molecular Benchmarch
+
+![Page views](https://visitor-badge.glitch.me/badge?page_id=gmrandazzo.mlmbench)
+[![Licence: GPL v3](https://img.shields.io/github/license/gmrandazzo/mlmbench)](https://github.com/gmrandazzo/mlmbench/blob/master/LICENSE)
+
 MLMBench collects datasets and splits them to do FAIR ML benchmarks.
 MLMBench can be used with different ML algorithms and data representations
 for molecular property/activity predictions and more.
