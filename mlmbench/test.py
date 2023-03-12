@@ -23,7 +23,7 @@ def print_ds(dataset):
     """
     Print the dataset
     """
-    for train_data, test_data, val_data in dataset:
+    for train_data, test_data, val_data, _, _, _ in dataset:
         print("train ",
               train_data["xdata"].shape,
               train_data["target"].shape,

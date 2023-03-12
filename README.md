@@ -38,6 +38,39 @@ pip3 install mlmbench
 
 ```
 
+Split types per dataset
+-----------------------
+mlmbench includes for every dataset two different splits:
+- random split using "mkrndsplits.py" starting from a list of names
+- target extrapolation using "mktgtextrapsplits.py" starting from the target file.
+  In this case, the algorithm will first import the target file, and then for every column,
+  rank from min to max the queue and split the ordered target
+  into "N" splits selected by the user. This split aims to check for "extrapolation."
+- literature split (if available). In this case, we try to preserve particular splits published by users.
+
+Available datasets
+------------------
+
+- BACE-moleculenet
+- BACE-random
+- BACE-tgt_extrapolation
+- FU-random
+- FU-tgt_extrapolation
+- HLMCLint-random
+- HLMCLint-tgt_extrapolation
+- MeltingPoint-random
+- MeltingPoint-tgt_extrapolation
+- NIR_Gasoline-random
+- NIR_Gasoline-tgt_extrapolation
+- SteroidsLSS-isomers
+- SteroidsLSS-random
+- SteroidsLSS-tgt_extrapolation
+- esol-chemdiversity
+- esol-random
+- esol-tgt_extrapolation
+- logDpH7.4-random
+- logDpH7.4-tgt_extrapolation
+
 How to use
 ----------
 

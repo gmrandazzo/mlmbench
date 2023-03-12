@@ -78,6 +78,23 @@ class Datasets():
         """
         return self.dsets.keys()
 
+    def get_target_type(self, name):
+        y = np.array(list(self.dsets[name]["target"].data.values()),
+                     dtype=float)
+        if np.equal(y, y.astype(int)).all():
+            if y.shape[1] > 1:
+                if y[0].sum() > 1:
+                    return "multi-label classification"
+                else:
+                    return "multi-class classification"
+            else:
+                return "single-class classification"
+        else:
+            if y.shape[1] > 1:
+                return "multi-task regression"
+            else:
+                return "single-task regression"
+
     def get_info(self, name):
         """
         Get info regarding the dataset
@@ -88,7 +105,8 @@ class Datasets():
             nobjects = len(self.dsets[name]["xdata"].data.keys())
             nfeatures = len(self.dsets[name]["xdata"].header)
             ntargets = len(self.dsets[name]["target"].header)
-            return nobjects, nfeatures, ntargets
+            dataset_type = self.get_target_type(name)
+            return nobjects, nfeatures, ntargets, dataset_type
         else:
             return None, None, None
 
@@ -173,13 +191,18 @@ class Datasets():
             train_data = self.make_set(dataset, split["train_keys"])
             test_data = self.make_set(dataset, split["test_keys"])
             val_data = self.make_set(dataset, split["val_keys"])
-            yield train_data, test_data, val_data
+            yield [train_data,
+                   test_data,
+                   val_data,
+                   split["train_keys"],
+                   split["test_keys"],
+                   split["val_keys"]]
 
 if __name__ in "__main__":
     ds = Datasets()
     print("Test ESOL")
     print(ds.get_info("NIR_Gasoline-random"))
-    for train_data, test_data, val_data in ds.ttv_generator("NIR_Gasoline-random"):
+    for train_data, test_data, val_data, _, _, _ in ds.ttv_generator("NIR_Gasoline-random"):
         print("train ",
               train_data["xdata"].shape,
             train_data["target"].shape,
